@@ -15,7 +15,7 @@ public class MessageConsumer {
     public void listen(CreateUserEvent userEvent) {
         System.out.println("Received message: " + userEvent.toString());
 
-        // create new records in the student_courses table
+        // Create new records in the student_courses table
        courseService.createStudentCourseRecord(userEvent.getId(), userEvent.getMajor());
     }
 }
