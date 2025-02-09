@@ -1,6 +1,7 @@
 package com.example.lmscourses.controllers;
 
 import com.example.lmscourses.entities.CourseEntity;
+import com.example.lmscourses.exceptions.CourseCreationException;
 import com.example.lmscourses.requests.CreateCourseRequest;
 import com.example.lmscourses.services.CourseService;
 import jakarta.validation.Valid;
@@ -19,7 +20,11 @@ public class CourseController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createCourse(@RequestBody @Valid CreateCourseRequest request){
-        CourseEntity createdCourse = courseService.saveCourse(request);
-        return ResponseEntity.ok(createdCourse);
+        try{
+            CourseEntity createdCourse = courseService.saveCourse(request);
+            return ResponseEntity.ok(createdCourse);
+        }catch(CourseCreationException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
