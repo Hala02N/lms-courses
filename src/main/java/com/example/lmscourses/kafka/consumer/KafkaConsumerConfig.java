@@ -21,8 +21,6 @@ public class KafkaConsumerConfig {
     @Bean
     public ConsumerFactory<String, CreateUserEvent> consumerFactory() {
         JsonDeserializer<CreateUserEvent> deserializer = new JsonDeserializer<>(CreateUserEvent.class);
-        //deserializer.setRemoveTypeHeaders(false);
-        //deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true); // this line solved the infinite deserialization exception
 
         Map<String, Object> configProps = new HashMap<String, Object>();
