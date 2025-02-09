@@ -5,20 +5,13 @@ public class CreateUserEvent {
 
     private String major;
 
-
     public Integer getId() { return id; }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public void setId(Integer id) { this.id = id; }
 
-    public String getMajor() {
-        return major;
-    }
+    public String getMajor() { return major; }
 
-    public void setMajor(String major) {
-        this.major = major;
-    }
+    public void setMajor(String major) { this.major = major; }
 
     @Override
     public String toString(){
