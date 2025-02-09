@@ -2,6 +2,7 @@ package com.example.lmscourses.services;
 
 import com.example.lmscourses.entities.CourseEntity;
 import com.example.lmscourses.entities.StudentCoursesEntity;
+import com.example.lmscourses.exceptions.CourseCreationException;
 import com.example.lmscourses.repositories.CourseRepository;
 import com.example.lmscourses.repositories.StudentCoursesRepository;
 import com.example.lmscourses.requests.CreateCourseRequest;
@@ -25,33 +26,37 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public void createStudentCourseRecord(Integer userId, String major) {
         ArrayList<CourseEntity> courses = courseRepository.findByMajor(major);
+        ArrayList<StudentCoursesEntity> studentCoursesEntities = new ArrayList<>();
         // it can be optimized by saveAll
         for(CourseEntity course: courses) {
             StudentCoursesEntity studentCoursesEntity = new StudentCoursesEntity();
             studentCoursesEntity.setCourseId(course.getId());
             studentCoursesEntity.setStudentId(userId);
-            studentCoursesRepository.save(studentCoursesEntity);  // can be enhanced to hit the db once
+            studentCoursesEntities.add(studentCoursesEntity);
         }
+        studentCoursesRepository.saveAll(studentCoursesEntities);  // Enhanced to hit the db once
         System.out.println("Courses registered successfully to the student of id: " + userId);
     }
     @Override
-    public CourseEntity saveCourse(CreateCourseRequest request){
-        CourseEntity courseFromCode = courseRepository.findByCode(request.getCode());
-        if(courseFromCode != null)
-            throw new RuntimeException("Course already exists");
-
+    public CourseEntity saveCourse(CreateCourseRequest request) throws CourseCreationException {
+        // Get course from redis if any exists
         Object courseCode = redisTemplate.opsForValue().get("Code");
         if(courseCode != null){
-            throw new RuntimeException("Can't create course due to duration restrictions");
+            throw new CourseCreationException("Can't create course due to duration restrictions");
         }
+
+        // Check if course already exist
+        CourseEntity courseFromCode = courseRepository.findByCode(request.getCode());
+        if(courseFromCode != null)
+            throw new CourseCreationException("Course already exists");
+
+        // If new course, create entity and populate it
         CourseEntity course = new CourseEntity();
         course.setName(request.getName());
         course.setMajor(request.getMajor());
-
         course.setCode(request.getCode());
-        // Get course from redis if any exists
 
-        // Rate Limiting using redis
+        // Store course record in Redis DB & apply Rate Limiting
         redisTemplate.opsForValue().set("Code", request.getCode());
         redisTemplate.expire("Code", 24, TimeUnit.HOURS);
         return courseRepository.save(course);
