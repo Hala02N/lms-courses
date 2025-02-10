@@ -1,16 +1,13 @@
 package com.example.lmscourses.controllers;
 
 import com.example.lmscourses.entities.CourseEntity;
-import com.example.lmscourses.exceptions.CourseCreationException;
+import com.example.lmscourses.exceptions.RequestValidationException;
 import com.example.lmscourses.requests.CreateCourseRequest;
 import com.example.lmscourses.services.CourseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/course")
@@ -23,8 +20,15 @@ public class CourseController {
         try{
             CourseEntity createdCourse = courseService.saveCourse(request);
             return ResponseEntity.ok(createdCourse);
-        }catch(CourseCreationException e){
+        }catch(RequestValidationException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @DeleteMapping("/student/{id}")
+    public ResponseEntity<?> deleteCoursesFromUserId(@PathVariable("id") Integer userId){
+        courseService.deleteAllCoursesOfUser(userId);
+        return ResponseEntity.ok("Courses of User with ID " + userId
+        + " has been deleted successfully");
     }
 }
