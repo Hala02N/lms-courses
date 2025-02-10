@@ -27,7 +27,18 @@ public class CourseEntity {
     private Date registrationDate;
 
     @Column(name = "updated_at", insertable = false)
-    private Date updatedAt = new Date();
+    private Date updatedAt;
+
+    @PreUpdate
+    public void updateDate(){
+        updatedAt = new Date();
+    }
+
+    @PrePersist
+    public void setRegistrationDateBeforePersistance() {
+        registrationDate = new Date();
+        updatedAt = new Date();
+    }
 
     public Integer getId() {
         return id;

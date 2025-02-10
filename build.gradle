@@ -28,6 +28,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// Elide Dependency
 	implementation("com.yahoo.elide:elide-spring-boot-starter:7.0.0-pr6")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	// Kafka
 	implementation("org.springframework.kafka:spring-kafka")
 	// Redis dependency
